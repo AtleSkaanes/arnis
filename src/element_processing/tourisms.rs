@@ -1,4 +1,4 @@
-use crate::block_definitions::*;
+use crate::block_definitions::Block;
 use crate::osm_parser::ProcessedNode;
 use crate::world_editor::WorldEditor;
 
@@ -23,7 +23,7 @@ pub fn generate_tourisms(editor: &mut WorldEditor, element: &ProcessedNode, grou
         if tourism_type == "information" {
             if let Some("board") = element.tags.get("information").map(|x: &String| x.as_str()) {
                 // TODO draw a sign
-                editor.set_block(OAK_PLANKS, x, ground_level + 1, z, None, None);
+                editor.set_block(Block::OakPlanks, x, ground_level + 1, z, None, None);
             }
         }
     }

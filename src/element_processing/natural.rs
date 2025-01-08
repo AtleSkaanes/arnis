@@ -1,5 +1,5 @@
 use crate::args::Args;
-use crate::block_definitions::*;
+use crate::block_definitions::Block;
 use crate::bresenham::bresenham_line;
 use crate::element_processing::tree::create_tree;
 use crate::floodfill::flood_fill_area;
@@ -38,25 +38,25 @@ pub fn generate_natural(
             let block_type: Block = match natural_type.as_str() {
                 "scrub" | "grassland" | "wood" => {
                     if args.winter {
-                        SNOW_BLOCK
+                        Block::SnowBlock
                     } else {
-                        GRASS_BLOCK
+                        Block::GrassBlock
                     }
                 }
-                "beach" | "sand" => SAND,
+                "beach" | "sand" => Block::Sand,
                 "tree_row" => {
                     if args.winter {
-                        SNOW_BLOCK
+                        Block::SnowBlock
                     } else {
-                        GRASS_BLOCK
+                        Block::GrassBlock
                     }
                 }
-                "wetland" | "water" => WATER,
+                "wetland" | "water" => Block::Water,
                 _ => {
                     if args.winter {
-                        SNOW_BLOCK
+                        Block::SnowBlock
                     } else {
-                        GRASS_BLOCK
+                        Block::GrassBlock
                     }
                 }
             };
@@ -102,7 +102,7 @@ pub fn generate_natural(
 
                     // Generate elements for "wood" and "tree_row"
                     if natural_type == "wood" || natural_type == "tree_row" {
-                        if editor.check_for_block(x, ground_level, z, None, Some(&[WATER])) {
+                        if editor.check_for_block(x, ground_level, z, None, Some(&[Block::Water])) {
                             continue;
                         }
 
@@ -118,14 +118,14 @@ pub fn generate_natural(
                             );
                         } else if random_choice == 2 {
                             let flower_block = match rng.gen_range(1..=4) {
-                                1 => RED_FLOWER,
-                                2 => BLUE_FLOWER,
-                                3 => YELLOW_FLOWER,
-                                _ => WHITE_FLOWER,
+                                1 => Block::RedFlower,
+                                2 => Block::BlueFlower,
+                                3 => Block::YellowFlower,
+                                _ => Block::WhiteFlower,
                             };
                             editor.set_block(flower_block, x, ground_level + 1, z, None, None);
                         } else if random_choice <= 1 {
-                            editor.set_block(GRASS, x, ground_level + 1, z, None, None);
+                            editor.set_block(Block::Grass, x, ground_level + 1, z, None, None);
                         }
                     }
                 }

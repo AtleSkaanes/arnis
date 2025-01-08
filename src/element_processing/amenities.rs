@@ -1,5 +1,5 @@
 use crate::args::Args;
-use crate::block_definitions::*;
+use crate::block_definitions::Block;
 use crate::bresenham::bresenham_line;
 use crate::floodfill::flood_fill_area;
 use crate::osm_parser::ProcessedElement;
@@ -33,18 +33,18 @@ pub fn generate_amenities(
             "waste_disposal" | "waste_basket" => {
                 // Place a cauldron for waste disposal or waste basket
                 if let Some((x, z)) = first_node {
-                    editor.set_block(CAULDRON, x, ground_level + 1, z, None, None);
+                    editor.set_block(Block::Cauldron, x, ground_level + 1, z, None, None);
                 }
             }
             "vending_machine" | "atm" => {
                 if let Some((x, z)) = first_node {
-                    editor.set_block(IRON_BLOCK, x, ground_level + 1, z, None, None);
-                    editor.set_block(IRON_BLOCK, x, ground_level + 2, z, None, None);
+                    editor.set_block(Block::IronBlock, x, ground_level + 1, z, None, None);
+                    editor.set_block(Block::IronBlock, x, ground_level + 2, z, None, None);
                 }
             }
             "bicycle_parking" => {
-                let ground_block: Block = OAK_PLANKS;
-                let roof_block: Block = STONE_BLOCK_SLAB;
+                let ground_block: Block = Block::OakPlanks;
+                let roof_block: Block = Block::StoneBlockSlab;
 
                 let polygon_coords: Vec<(i32, i32)> = element
                     .nodes()
@@ -65,7 +65,7 @@ pub fn generate_amenities(
 
                     for y in 1..=4 {
                         editor.set_block(ground_block, x, ground_level, z, None, None);
-                        editor.set_block(OAK_FENCE, x, ground_level + y, z, None, None);
+                        editor.set_block(Block::OakFence, x, ground_level + y, z, None, None);
                     }
                     editor.set_block(roof_block, x, ground_level + 5, z, None, None);
                 }
@@ -79,16 +79,16 @@ pub fn generate_amenities(
             "bench" => {
                 // Place a bench
                 if let Some((x, z)) = first_node {
-                    editor.set_block(SMOOTH_STONE, x, ground_level + 1, z, None, None);
-                    editor.set_block(OAK_LOG, x + 1, ground_level + 1, z, None, None);
-                    editor.set_block(OAK_LOG, x - 1, ground_level + 1, z, None, None);
+                    editor.set_block(Block::SmoothStone, x, ground_level + 1, z, None, None);
+                    editor.set_block(Block::OakLog, x + 1, ground_level + 1, z, None, None);
+                    editor.set_block(Block::OakLog, x - 1, ground_level + 1, z, None, None);
                 }
             }
             "vending" => {
                 // Place vending machine blocks
                 if let Some((x, z)) = first_node {
-                    editor.set_block(IRON_BLOCK, x, ground_level + 1, z, None, None);
-                    editor.set_block(IRON_BLOCK, x, ground_level + 2, z, None, None);
+                    editor.set_block(Block::IronBlock, x, ground_level + 1, z, None, None);
+                    editor.set_block(Block::IronBlock, x, ground_level + 2, z, None, None);
                 }
             }
             "parking" | "fountain" => {
@@ -98,9 +98,9 @@ pub fn generate_amenities(
                 let mut current_amenity: Vec<(i32, i32)> = vec![];
 
                 let block_type = match amenity_type.as_str() {
-                    "fountain" => WATER,
-                    "parking" => GRAY_CONCRETE,
-                    _ => GRAY_CONCRETE,
+                    "fountain" => Block::Water,
+                    "parking" => Block::GrayConcrete,
+                    _ => Block::GrayConcrete,
                 };
                 for node in element.nodes() {
                     let x: i32 = node.x;
@@ -116,7 +116,7 @@ pub fn generate_amenities(
                                 bx,
                                 ground_level,
                                 bz,
-                                Some(&[BLACK_CONCRETE]),
+                                Some(&[Block::BlackConcrete]),
                                 None,
                             );
 
@@ -126,7 +126,7 @@ pub fn generate_amenities(
                                     for dz in [-1, 0, 1].iter() {
                                         if (*dx, *dz) != (0, 0) {
                                             editor.set_block(
-                                                LIGHT_GRAY_CONCRETE,
+                                                Block::LightGrayConcrete,
                                                 bx + dx,
                                                 ground_level,
                                                 bz + dz,
@@ -159,18 +159,18 @@ pub fn generate_amenities(
                             x,
                             ground_level,
                             z,
-                            Some(&[BLACK_CONCRETE, GRAY_CONCRETE]),
+                            Some(&[Block::BlackConcrete, Block::GrayConcrete]),
                             None,
                         );
 
                         // Add parking spot markings
                         if amenity_type == "parking" && (x + z) % 8 == 0 && (x * z) % 32 != 0 {
                             editor.set_block(
-                                LIGHT_GRAY_CONCRETE,
+                                Block::LightGrayConcrete,
                                 x,
                                 ground_level,
                                 z,
-                                Some(&[BLACK_CONCRETE, GRAY_CONCRETE]),
+                                Some(&[Block::BlackConcrete, Block::GrayConcrete]),
                                 None,
                             );
                         }

@@ -1,5 +1,5 @@
 use crate::args::Args;
-use crate::block_definitions::*;
+use crate::block_definitions::Block;
 use crate::bresenham::bresenham_line;
 use crate::element_processing::tree::create_tree;
 use crate::floodfill::flood_fill_area;
@@ -22,36 +22,36 @@ pub fn generate_leisure(
         let block_type: Block = match leisure_type.as_str() {
             "park" => {
                 if args.winter {
-                    SNOW_BLOCK
+                    Block::SnowBlock
                 } else {
-                    GRASS_BLOCK
+                    Block::GrassBlock
                 }
             }
             "playground" | "recreation_ground" | "pitch" => {
                 if let Some(surface) = element.tags.get("surface") {
                     match surface.as_str() {
-                        "clay" => TERRACOTTA,
-                        "sand" => SAND,
-                        "tartan" => RED_TERRACOTTA,
-                        _ => GREEN_STAINED_HARDENED_CLAY,
+                        "clay" => Block::Terracotta,
+                        "sand" => Block::Sand,
+                        "tartan" => Block::RedTerracotta,
+                        _ => Block::GreenStainedHardenedClay,
                     }
                 } else {
-                    GREEN_STAINED_HARDENED_CLAY
+                    Block::GreenStainedHardenedClay
                 }
             }
             "garden" => {
                 if args.winter {
-                    SNOW_BLOCK
+                    Block::SnowBlock
                 } else {
-                    GRASS_BLOCK
+                    Block::GrassBlock
                 }
             }
-            "swimming_pool" => WATER,
+            "swimming_pool" => Block::Water,
             _ => {
                 if args.winter {
-                    SNOW_BLOCK
+                    Block::SnowBlock
                 } else {
-                    GRASS_BLOCK
+                    Block::GrassBlock
                 }
             }
         };
@@ -69,12 +69,12 @@ pub fn generate_leisure(
                         ground_level,
                         bz,
                         Some(&[
-                            GRASS_BLOCK,
-                            STONE_BRICKS,
-                            SMOOTH_STONE,
-                            LIGHT_GRAY_CONCRETE,
-                            COBBLESTONE,
-                            GRAY_CONCRETE,
+                            Block::GrassBlock,
+                            Block::StoneBricks,
+                            Block::SmoothStone,
+                            Block::LightGrayConcrete,
+                            Block::Cobblestone,
+                            Block::GrayConcrete,
                         ]),
                         None,
                     );
@@ -99,11 +99,18 @@ pub fn generate_leisure(
                 flood_fill_area(&polygon_coords, args.timeout.as_ref());
 
             for (x, z) in filled_area {
-                editor.set_block(block_type, x, ground_level, z, Some(&[GRASS_BLOCK]), None);
+                editor.set_block(
+                    block_type,
+                    x,
+                    ground_level,
+                    z,
+                    Some(&[Block::GrassBlock]),
+                    None,
+                );
 
                 // Add decorative elements for parks and gardens
                 if matches!(leisure_type.as_str(), "park" | "garden")
-                    && editor.check_for_block(x, ground_level, z, Some(&[GRASS_BLOCK]), None)
+                    && editor.check_for_block(x, ground_level, z, Some(&[Block::GrassBlock]), None)
                 {
                     let mut rng: rand::prelude::ThreadRng = rand::thread_rng();
                     let random_choice: i32 = rng.gen_range(0..1000);
@@ -111,23 +118,23 @@ pub fn generate_leisure(
                     match random_choice {
                         0 => {
                             // Benches
-                            editor.set_block(OAK_LOG, x, ground_level + 1, z, None, None);
-                            editor.set_block(OAK_LOG, x + 1, ground_level + 1, z, None, None);
-                            editor.set_block(OAK_LOG, x - 1, ground_level + 1, z, None, None);
+                            editor.set_block(Block::OakLog, x, ground_level + 1, z, None, None);
+                            editor.set_block(Block::OakLog, x + 1, ground_level + 1, z, None, None);
+                            editor.set_block(Block::OakLog, x - 1, ground_level + 1, z, None, None);
                         }
                         1..=30 => {
                             // Flowers
                             let flower_choice = match rng.gen_range(0..4) {
-                                0 => RED_FLOWER,
-                                1 => YELLOW_FLOWER,
-                                2 => BLUE_FLOWER,
-                                _ => WHITE_FLOWER,
+                                0 => Block::RedFlower,
+                                1 => Block::YellowFlower,
+                                2 => Block::BlueFlower,
+                                _ => Block::WhiteFlower,
                             };
                             editor.set_block(flower_choice, x, ground_level + 1, z, None, None);
                         }
                         31..=70 => {
                             // Grass
-                            editor.set_block(GRASS, x, ground_level + 1, z, None, None);
+                            editor.set_block(Block::Grass, x, ground_level + 1, z, None, None);
                         }
                         71..=80 => {
                             // Tree
@@ -153,35 +160,98 @@ pub fn generate_leisure(
                         0..=10 => {
                             // Swing set
                             for y in 1..=4 {
-                                editor.set_block(OAK_FENCE, x - 1, ground_level + y, z, None, None);
-                                editor.set_block(OAK_FENCE, x + 1, ground_level + y, z, None, None);
+                                editor.set_block(
+                                    Block::OakFence,
+                                    x - 1,
+                                    ground_level + y,
+                                    z,
+                                    None,
+                                    None,
+                                );
+                                editor.set_block(
+                                    Block::OakFence,
+                                    x + 1,
+                                    ground_level + y,
+                                    z,
+                                    None,
+                                    None,
+                                );
                             }
-                            editor.set_block(OAK_FENCE, x, ground_level + 4, z, None, None);
-                            editor.set_block(STONE_BLOCK_SLAB, x, ground_level + 2, z, None, None);
+                            editor.set_block(Block::OakFence, x, ground_level + 4, z, None, None);
+                            editor.set_block(
+                                Block::StoneBlockSlab,
+                                x,
+                                ground_level + 2,
+                                z,
+                                None,
+                                None,
+                            );
                         }
                         11..=20 => {
                             // Slide
-                            editor.set_block(OAK_SLAB, x, ground_level + 1, z, None, None);
-                            editor.set_block(OAK_SLAB, x + 1, ground_level + 2, z, None, None);
-                            editor.set_block(OAK_SLAB, x + 2, ground_level + 3, z, None, None);
+                            editor.set_block(Block::OakSlab, x, ground_level + 1, z, None, None);
+                            editor.set_block(
+                                Block::OakSlab,
+                                x + 1,
+                                ground_level + 2,
+                                z,
+                                None,
+                                None,
+                            );
+                            editor.set_block(
+                                Block::OakSlab,
+                                x + 2,
+                                ground_level + 3,
+                                z,
+                                None,
+                                None,
+                            );
 
-                            editor.set_block(OAK_PLANKS, x + 2, ground_level + 2, z, None, None);
-                            editor.set_block(OAK_PLANKS, x + 2, ground_level + 1, z, None, None);
+                            editor.set_block(
+                                Block::OakPlanks,
+                                x + 2,
+                                ground_level + 2,
+                                z,
+                                None,
+                                None,
+                            );
+                            editor.set_block(
+                                Block::OakPlanks,
+                                x + 2,
+                                ground_level + 1,
+                                z,
+                                None,
+                                None,
+                            );
 
-                            editor.set_block(LADDER, x + 2, ground_level + 2, z - 1, None, None);
-                            editor.set_block(LADDER, x + 2, ground_level + 1, z - 1, None, None);
+                            editor.set_block(
+                                Block::Ladder,
+                                x + 2,
+                                ground_level + 2,
+                                z - 1,
+                                None,
+                                None,
+                            );
+                            editor.set_block(
+                                Block::Ladder,
+                                x + 2,
+                                ground_level + 1,
+                                z - 1,
+                                None,
+                                None,
+                            );
                         }
                         21..=30 => {
                             // Sandpit
                             editor.fill_blocks(
-                                SAND,
+                                Block::Sand,
                                 x - 3,
                                 ground_level,
                                 z - 3,
                                 x + 3,
                                 ground_level,
                                 z + 3,
-                                Some(&[GREEN_STAINED_HARDENED_CLAY]),
+                                Some(&[Block::GreenStainedHardenedClay]),
                                 None,
                             );
                         }

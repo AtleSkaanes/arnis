@@ -1,5 +1,5 @@
 use crate::args::Args;
-use crate::block_definitions::{DIRT, GRASS_BLOCK, SNOW_BLOCK};
+use crate::block_definitions::Block;
 use crate::element_processing::*;
 use crate::osm_parser::ProcessedElement;
 use crate::progress::emit_gui_progress_update;
@@ -147,12 +147,16 @@ pub fn generate_world(
     let total_iterations_grnd: f64 = (scale_factor_x + 1.0) * (scale_factor_z + 1.0);
     let progress_increment_grnd: f64 = 30.0 / total_iterations_grnd;
 
-    let groundlayer_block = if args.winter { SNOW_BLOCK } else { GRASS_BLOCK };
+    let groundlayer_block = if args.winter {
+        Block::SnowBlock
+    } else {
+        Block::GrassBlock
+    };
 
     for x in 0..=(scale_factor_x as i32) {
         for z in 0..=(scale_factor_z as i32) {
             editor.set_block(groundlayer_block, x, ground_level, z, None, None);
-            editor.set_block(DIRT, x, ground_level - 1, z, None, None);
+            editor.set_block(Block::Dirt, x, ground_level - 1, z, None, None);
 
             block_counter += 1;
             if block_counter % batch_size == 0 {

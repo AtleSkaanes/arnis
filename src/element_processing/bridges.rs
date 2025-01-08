@@ -1,4 +1,4 @@
-use crate::block_definitions::*;
+use crate::block_definitions::Block;
 use crate::bresenham::bresenham_line;
 use crate::osm_parser::ProcessedWay;
 use crate::world_editor::WorldEditor;
@@ -33,7 +33,7 @@ pub fn generate_bridges(editor: &mut WorldEditor, element: &ProcessedWay, ground
 
                 // Place bridge blocks
                 for dx in -2..=2 {
-                    editor.set_block(LIGHT_GRAY_CONCRETE, *x + dx, bridge_y, *z, None, None);
+                    editor.set_block(Block::LightGrayConcrete, *x + dx, bridge_y, *z, None, None);
                 }
             }
         }

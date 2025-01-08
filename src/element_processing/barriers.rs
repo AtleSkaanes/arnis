@@ -1,4 +1,4 @@
-use crate::block_definitions::*;
+use crate::block_definitions::Block;
 use crate::bresenham::bresenham_line;
 use crate::osm_parser::ProcessedElement;
 use crate::world_editor::WorldEditor;
@@ -8,7 +8,7 @@ pub fn generate_barriers(editor: &mut WorldEditor, element: &ProcessedElement, g
         if barrier_type == "bollard" {
             if let ProcessedElement::Node(node) = element {
                 editor.set_block(
-                    COBBLESTONE_WALL,
+                    Block::CobblestoneWall,
                     node.x,
                     ground_level + 1,
                     node.z,
@@ -43,14 +43,14 @@ pub fn generate_barriers(editor: &mut WorldEditor, element: &ProcessedElement, g
                 for (bx, _, bz) in bresenham_points {
                     // Build the barrier wall to the specified height
                     for y in (ground_level + 1)..=(ground_level + wall_height) {
-                        editor.set_block(COBBLESTONE_WALL, bx, y, bz, None, None);
+                        editor.set_block(Block::CobblestoneWall, bx, y, bz, None, None);
                         // Barrier wall
                     }
 
                     // Add an optional top to the barrier if the height is more than 1
                     if wall_height > 1 {
                         editor.set_block(
-                            STONE_BRICK_SLAB,
+                            Block::StoneBrickSlab,
                             bx,
                             ground_level + wall_height + 1,
                             bz,
