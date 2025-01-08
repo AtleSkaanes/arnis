@@ -57,7 +57,6 @@ pub enum Block {
     MossBlock,
     MossyCobblestone,
     MudBricks,
-    NetherBrick,
     NetherBricks,
     OakFence,
     OakLeaves,
@@ -182,7 +181,6 @@ impl Block {
             Self::MossBlock => "moss_block",
             Self::MossyCobblestone => "mossy_cobblestone",
             Self::MudBricks => "mud_bricks",
-            Self::NetherBrick => "nether_bricks",
             Self::NetherBricks => "nether_bricks",
             Self::OakFence => "oak_fence",
             Self::OakLeaves => "oak_leaves",
@@ -321,7 +319,6 @@ pub fn building_corner_variations() -> Vec<Block> {
         Block::CrackedStoneBricks,
         Block::Prismarine,
         Block::BlueTerracotta,
-        Block::NetherBrick,
         Block::QuartzBricks,
     ]
 }
